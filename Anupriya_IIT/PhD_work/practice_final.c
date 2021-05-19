@@ -4,8 +4,8 @@
 #include<stdbool.h>
 #include "mt19937ar.h"
 #include "mt19937ar.c"
-#define Lx 10
-#define Ly 10
+#define Lx 50
+#define Ly 50
 #define N (Lx*Ly)
 #define n (N/K)  //total no of K-mer
 #define K 3
@@ -137,6 +137,8 @@ int rotate(int pivotx,int pivoty,int orientation)
                     Lat[PBCX(pivotx+i)][pivoty] =0;
                     Lat[pivotx][PBCY(pivoty-i)] = Lat[pivotx][pivoty] ;   
                     Lat[PBCX(pivotx-i)][pivoty] =0;
+                    ver_count--;
+                    hor_count++;
                    // Lat[pivotx][pivoty]=Lat[pivotx][pivoty];
                 }
                 else
@@ -146,6 +148,8 @@ int rotate(int pivotx,int pivoty,int orientation)
                     Lat[PBCX(pivotx+i)][pivoty] =Lat[pivotx][pivoty];
                     Lat[pivotx][PBCY(pivoty-i)] =0;   
                     Lat[PBCX(pivotx-i)][pivoty] =Lat[pivotx][pivoty];
+                    ver_count++;
+                    hor_count--;
                    // Lat[pivotx][pivoty]=Lat[pivotx][pivoty];
                 }
             }
@@ -156,7 +160,7 @@ int rotate(int pivotx,int pivoty,int orientation)
 int translate(int pivotx,int pivoty,int orientation)
 {
     double r=(double)(rand())/(double)(RAND_MAX);
-    printf("random = %f\n",r );
+   // printf("random = %f\n",r );
    if(r>0.5)
    {
        return shiftRightUp(pivotx,pivoty,orientation);
@@ -242,8 +246,68 @@ int printLattice()
         return 0;
 }
 
+
 int NN_orientation(int pivotX,int pivotY){
-    return h_orientation; // to do
+
+    int n_h, n_v;
+
+    int KMerBoundary[n+1];
+
+    if(orientation_type[Lat[pivotX][pivotY]] == h_orientation)
+    {
+            for(int k = 0 ; k < K ; k++)
+            {
+                KMerBoundary[Lat[PBCX(pivotX-1)][PBCY(pivotY-K/2+k)]]=1;
+                KMerBoundary[Lat[PBCX(pivotX+1)][PBCY(pivotY-K/2+k)]]=1;
+            }
+                            
+                KMerBoundary[Lat[PBCX(pivotX)][PBCY(pivotY-K/2-1)]]=1;
+                KMerBoundary[Lat[PBCX(pivotX)][PBCY(pivotY+K/2+1)]]=1;
+    }
+    else
+        if(orientation_type[Lat[pivotX][pivotY]] == v_orientation){
+    {
+            for(int k = 0 ; k < K ; k++)
+            {
+                KMerBoundary[Lat[PBCX(pivotX-K/2+k)][PBCY(pivotY-1)]]=1;
+                KMerBoundary[Lat[PBCX(pivotX-K/2+k)][PBCY(pivotY+1)]]=1;
+            }
+                            
+                KMerBoundary[Lat[PBCX(pivotX-K/2-1)][PBCY(pivotY)]]=1;
+                KMerBoundary[Lat[PBCX(pivotX+K/2+1)][PBCY(pivotY)]]=1;
+            }
+    }
+
+    for(int i = 1 ;i<=n ; i++)
+    {
+        if(KMerBoundary[i] == 1)
+        {
+            if(orientation_type[i]==h_orientation)
+                n_h++;
+            else
+                n_v++;
+        }    
+    }
+    
+
+
+    if(n_h > n_v){
+        return h_orientation;
+    }
+    else{
+        if(n_h < n_v)
+            return v_orientation;
+        else{
+            double r=(double)(rand())/(double)(RAND_MAX);
+            if(r < 0.5){
+                return h_orientation;
+            } 
+            else{
+                return v_orientation;
+            }
+
+        }
+    }
 }
 
 void Lattice_init(){
@@ -269,7 +333,7 @@ int evolve()
         double r=(double)(rand())/(double)(RAND_MAX);
         
         
-        if (r<p1){
+        if (r < p1){
             if(orientation_type[Lat[pivotListX[pivotChoice]][pivotListY[pivotChoice]]] !=  NN_orientation(pivotListX[pivotChoice],pivotListY[pivotChoice]))
             rotate(pivotListX[pivotChoice],pivotListY[pivotChoice],orientation_type[Lat[pivotListX[pivotChoice]][pivotListY[pivotChoice]]]);
         }
@@ -286,7 +350,7 @@ int evolve()
 
 
 
-        /*{
+      /*  {
             printf("translate (%d,%d))\n", pivotListX[pivotChoice],pivotListY[pivotChoice]);
             translate(pivotListX[pivotChoice],pivotListY[pivotChoice],orientation_type[Lat[pivotListX[pivotChoice]][pivotListY[pivotChoice]]]);
             printLattice();
@@ -310,6 +374,7 @@ int main (){
   //  printf("orientation %d K_mer_no %d\n",orientation_type[i],i );
     evolve();
 
+    printf("horizontal %d \n vertical %d", hor_count, ver_count);
     printf("%s\n", "final");
     printLattice();
 
