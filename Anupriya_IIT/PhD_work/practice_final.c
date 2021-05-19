@@ -10,6 +10,9 @@
 #define n (N/K)  //total no of K-mer
 #define K 3
 #define N (Lx*Ly)
+#define p1 0.4
+#define p2 0.3
+#define p3 0.3
 #define h_orientation 1
 #define v_orientation 2
 
@@ -25,6 +28,7 @@ int shiftLeftDown(int pivotx,int pivoty,int orientation);
 int shiftRightUp(int pivotx,int pivoty,int orientation);
 int rotate(int pivotx,int pivoty,int orientation);
 int translate(int pivotx,int pivoty,int orientation);
+int NN_orientation();
 
 
 
@@ -238,6 +242,10 @@ int printLattice()
         return 0;
 }
 
+int NN_orientation(int pivotX,int pivotY){
+    return h_orientation; // to do
+}
+
 void Lattice_init(){
     for (int i = 0; i < n; i++)
     {
@@ -259,9 +267,26 @@ int evolve()
     {
         int pivotChoice = K_mer_counter*genrand_real3();
         double r=(double)(rand())/(double)(RAND_MAX);
+        
+        
+        if (r<p1){
+            if(orientation_type[Lat[pivotListX[pivotChoice]][pivotListY[pivotChoice]]] !=  NN_orientation(pivotListX[pivotChoice],pivotListY[pivotChoice]))
+            rotate(pivotListX[pivotChoice],pivotListY[pivotChoice],orientation_type[Lat[pivotListX[pivotChoice]][pivotListY[pivotChoice]]]);
+        }
+        else{
+            if(r >= p1 && r < p2)
+                rotate(pivotListX[pivotChoice],pivotListY[pivotChoice],orientation_type[Lat[pivotListX[pivotChoice]][pivotListY[pivotChoice]]]);
+        }
+    
+    
+        translate(pivotListX[pivotChoice],pivotListY[pivotChoice],orientation_type[Lat[pivotListX[pivotChoice]][pivotListY[pivotChoice]]]);
+    }
+        
 
-        if (r<=0.5)
-        {
+
+
+
+        /*{
             printf("translate (%d,%d))\n", pivotListX[pivotChoice],pivotListY[pivotChoice]);
             translate(pivotListX[pivotChoice],pivotListY[pivotChoice],orientation_type[Lat[pivotListX[pivotChoice]][pivotListY[pivotChoice]]]);
             printLattice();
@@ -271,10 +296,10 @@ int evolve()
             printf("rotate (%d,%d))\n", pivotListX[pivotChoice],pivotListY[pivotChoice]);
             rotate(pivotListX[pivotChoice],pivotListY[pivotChoice],orientation_type[Lat[pivotListX[pivotChoice]][pivotListY[pivotChoice]]]);
             printLattice();
-        }
+        }*/
 
-    }
 }
+
 
 int main (){
     int i,j,t;
