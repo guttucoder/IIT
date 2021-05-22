@@ -186,7 +186,7 @@ int shiftRightUp(int pivotx,int pivoty,int orientation,int pivotChoice)
          if(Lat[headx][pivoty] == 0)
          {
             Lat[headx][pivoty] = Lat[pivotx][pivoty];
-            Lat[pivotx+(K/2)][pivoty] = 0;
+            Lat[PBCX(pivotx+(K/2))][pivoty] = 0;
             pivotListX[pivotChoice]=PBCX(pivotListX[pivotChoice]-1);
          }
          else
@@ -201,7 +201,7 @@ int shiftRightUp(int pivotx,int pivoty,int orientation,int pivotChoice)
          if(Lat[pivotx][heady] == 0)
          {
             Lat[pivotx][heady] = Lat[pivotx][pivoty];
-            Lat[pivotx][pivoty-(K/2)] = 0;
+            Lat[pivotx][PBCY(pivoty-(K/2))] = 0;
             pivotListY[pivotChoice]=PBCY(1+pivotListY[pivotChoice]);
 
          }
@@ -263,6 +263,13 @@ int printLattice()
 int NN_orientation(int pivotX,int pivotY){
 
     int n_h, n_v;
+    if(orientation_type[Lat[pivotX][pivotY]]==h_orientation)
+    {
+        n_h++;
+    }else
+    {
+        n_v++;
+    }
 
     int KMerBoundary[n+1];
 
