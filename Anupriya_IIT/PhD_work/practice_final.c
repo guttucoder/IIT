@@ -4,16 +4,18 @@
 #include<stdbool.h>
 #include "mt19937ar.h"
 #include "mt19937ar.c"
-#define Lx 10
-#define Ly 10
+#define Lx 70
+#define Ly 70
 #define N (Lx*Ly)
-#define n (N/K)  //total no of K-mer
-#define K 3
+#define n (N/K)  //total no of possible K-mer
+#define K 7
 #define N (Lx*Ly)
-#define p 1
+#define T 10000000
+#define p 0.5
 #define p1 1-p
 #define p2 p/2.0
 #define p3 p/2.0
+#define GAP 1000
 #define h_orientation 1
 #define v_orientation 2
 
@@ -30,7 +32,8 @@ int shiftRightUp(int pivotx,int pivoty,int orientation, int pivotChoice);
 int rotate(int pivotx,int pivoty,int orientation);
 int translate(int pivotx,int pivoty,int orientation, int pivotChoice);
 int NN_orientation();
-
+void output (int t);
+char outfile1[100];
 
 int PBCX(int x)
 {
@@ -143,8 +146,7 @@ int rotate(int pivotx,int pivoty,int orientation)
                     Lat[PBCX(pivotx+i)][pivoty] =0;
                     Lat[pivotx][PBCY(pivoty-i)] = Lat[pivotx][pivoty] ;   
                     Lat[PBCX(pivotx-i)][pivoty] =0;
-                    ver_count--;
-                    hor_count++;
+
                    // Lat[pivotx][pivoty]=Lat[pivotx][pivoty];
                    // printf("\nrotated: orientation_type %d, pivotx %d pivoty %d, New_Lat_no_right %d, Old_Lat_no_down %d, New_Lat_no_left %d, Old_Lat_no_up %d\n",h_orientation, pivotx, pivoty,Lat[pivotx][PBCY(pivoty+i)],Lat[PBCX(pivotx+i)][pivoty], Lat[pivotx][PBCY(pivoty-i)],Lat[PBCX(pivotx-i)][pivoty] );
                 }
@@ -155,11 +157,18 @@ int rotate(int pivotx,int pivoty,int orientation)
                     Lat[PBCX(pivotx+i)][pivoty] =Lat[pivotx][pivoty];
                     Lat[pivotx][PBCY(pivoty-i)] =0;   
                     Lat[PBCX(pivotx-i)][pivoty] =Lat[pivotx][pivoty];
-                    ver_count++;
-                    hor_count--;
+
                    // Lat[pivotx][pivoty]=Lat[pivotx][pivoty];
                 }
             }
+                if (orientation==2)
+                {    ver_count--;
+                     hor_count++;
+                }
+                else{                   
+                     ver_count++;
+                     hor_count--;
+                 }
             return 0;
 }
 
@@ -240,7 +249,9 @@ int shiftLeftDown(int pivotx,int pivoty,int orientation,int pivotChoice)
             Lat[pivotx][PBCY(pivoty+(K/2))] = 0;
             pivotListY[pivotChoice]=PBCY(pivotListY[pivotChoice]-1);
 
-         }else{return -1;
+         }
+         else{
+            return -1;
              
          }
     }
@@ -263,6 +274,8 @@ int printLattice()
 int NN_orientation(int pivotX,int pivotY){
 
     int n_h, n_v;
+    int KMerBoundary[n+1];
+
     if(orientation_type[Lat[pivotX][pivotY]]==h_orientation)
     {
         n_h++;
@@ -271,7 +284,6 @@ int NN_orientation(int pivotX,int pivotY){
         n_v++;
     }
 
-    int KMerBoundary[n+1];
 
     if(orientation_type[Lat[pivotX][pivotY]] == h_orientation)
     {
@@ -348,13 +360,15 @@ void Lattice_init(){
 int evolve()
 {
      int pivotChoice; 
-    for(int i =0 ; i < n ; i ++)
-    {
-        pivotChoice = K_mer_counter*genrand_real3();
-        printf("pvc%d\n",pivotChoice);
-        printf("pvcxy%d:%d\n",pivotListX[pivotChoice],pivotListY[pivotChoice]);
-        printf("kmrid%d\n",Lat[pivotListX[pivotChoice]][pivotListY[pivotChoice]]);
+    
+      //  for(int i =0 ; i < n ; i ++)
+        //{
+            pivotChoice = K_mer_counter*genrand_real3();
+         //printf("pvc%d\n",pivotChoice);
+        //printf("pvcxy%d:%d\n",pivotListX[pivotChoice],pivotListY[pivotChoice]);
+        //printf("kmrid%d\n",Lat[pivotListX[pivotChoice]][pivotListY[pivotChoice]]);
         double r=(double)(rand())/(double)(RAND_MAX);
+
         
         
         if (r < p1){
@@ -366,16 +380,14 @@ int evolve()
                 rotate(pivotListX[pivotChoice],pivotListY[pivotChoice],orientation_type[Lat[pivotListX[pivotChoice]][pivotListY[pivotChoice]]]);
         }
         
-        printLattice();
+       // printLattice();
         translate(pivotListX[pivotChoice],pivotListY[pivotChoice],orientation_type[Lat[pivotListX[pivotChoice]][pivotListY[pivotChoice]]],pivotChoice);
-        printLattice();
-
-    }
-
+       // printLattice();
         
 
+//        }
 
-
+    
 
        /*{
             printf("translate (%d,%d))\n", pivotListX[pivotChoice],pivotListY[pivotChoice]);
@@ -392,17 +404,42 @@ int evolve()
 }
 
 
+void output (int t){
+        double tmp;
+        FILE *fp;
+
+        printf("t %d n_h: %d, n_v: %d\n",t, hor_count, ver_count);
+        tmp=1.0*(hor_count- ver_count)/(1.0*K_mer_counter);
+        sprintf(outfile1,"K_mer%dLat_size%dprob.dat",K,Lx,p);
+        fp=fopen(outfile1,"a");
+        fprintf(fp,"%d  %e\n",t,fabs(tmp));
+        fclose(fp);
+        
+    }
+
+
 int main (){
-    int i,j,t;
+    int i,t;
     
     Lattice_init();
-    for(i=0; i<K_mer_counter; i++){
-    printf("\n\npivotx %d pivoty %d K_mer_id %d orientation %d", pivotListX[i], pivotListY[i], Lat[pivotListX[i]][pivotListY[i]], orientation_type[Lat[pivotListX[i]][pivotListY[i]]]);
-}
+  //  for(i=0; i<K_mer_counter; i++){
+  //  printf("\n\npivotx %d pivoty %d K_mer_id %d orientation %d", pivotListX[i], pivotListY[i], Lat[pivotListX[i]][pivotListY[i]], orientation_type[Lat[pivotListX[i]][pivotListY[i]]]);
+//}
 
-for(i=1; i<= n; i++)
-    printf("orientation %d K_mer_no %d\n",orientation_type[i],i );
-    evolve();
+for(t=0; t<T; t++)
+    {
+        for(i=0; i<K_mer_counter; i++){
+        
+            evolve();
+        }
+        
+        if(t % GAP == 0)
+            output(t);
+    }
+
+//for(i=1; i<= n; i++)
+   // printf("orientation %d K_mer_no %d\n",orientation_type[i],i );
+  //  evolve();
 
     printf("horizontal %d \n vertical %d", hor_count, ver_count);
     printf("%s\n", "final");
