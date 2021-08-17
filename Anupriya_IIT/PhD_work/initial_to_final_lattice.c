@@ -12,7 +12,7 @@
 #define K 7
 #define N (Lx*Ly)
 #define T 100000000
-#define rho 0.65
+#define rho 0.80
 #define p 1
 #define p1 1-p
 #define p2 p/2.0
@@ -394,8 +394,189 @@ int NN_orientation(int pivotX,int pivotY){
 
 
 void Lattice_init() {
+    
+ /*   int i,j,k;                      // for all vertical initial configuration
+    bool flag;
+   i=0;
+    do
+    {
+         vertical();
+         i++;
+    }
+    while (i != N_Kmer); 
+      
+      for(i=0;i<Lx;i++){                                                         
+         for(j=0; j<Ly; j+=K){
+            if(K_mer_counter == N_Kmer){
+               break;
+            }
 
-    int i, j, k;
+               flag = true;
+               for(k=j; k<(j+K); k++){
+                  if(Lat[PBCY(k)][i]!=0){
+                     flag = false;
+                  }
+               }
+                  if (flag == true){
+                  double r= (double)(rand())/(double)(RAND_MAX);
+                     if (r<0.2){                  //change
+                        for(k=j; k<(j+K); k++){
+                        Lat[PBCY(k)][i]= 0;
+                     }
+                  }
+                     else{
+                        pivotListY[K_mer_counter]=i;
+                        pivotListX[K_mer_counter]=PBCY(j+K/2);
+                        headListY[K_mer_counter]=PBCY(j);
+                        printf("\n horizontal: K_mer_counter%d pivotx %d pivoty %d\n",K_mer_counter+1,pivotListX[K_mer_counter], pivotListY[K_mer_counter]);
+                       // printf("\n %d %d 7 7",pivotListX[K_mer_counter], HeadlistY[K_mer_counter]);
+                        K_mer_counter++;     
+                        orientation_type[K_mer_counter]= v_orientation;
+                        ver_count++;
+
+                        for(k=j; k<(j+K); k++){
+                        Lat[PBCY(k)][i]= K_mer_counter;
+                        }
+                     }
+                  
+             //  Lat[i][PBCY(k)]= K_mer_counter;
+             //  orientation_type[Lat[i][k]] = h_orientation;
+         
+         //   K_mer_counter++;
+
+         
+                  }
+         }
+      }
+
+
+    printf("\ntotal k=mers:%d\n",K_mer_counter); */
+
+
+
+
+/****************************************************************************************************************************************/
+ int i, j, k;                  // all horizontal at high density initial configuration
+    bool flag;
+
+/*    printf("initial configuration:\n");
+    for (i = 0; i < Lx; i++) {
+        for (j = 0; j < (4*Ly) / 5; j += K) {
+            if (K_mer_counter == N_Kmer) {
+                break;
+            }
+
+            for (k = j; k < (j + K); k++) {
+
+                pivotListX[K_mer_counter] = i;
+                pivotListY[K_mer_counter] = PBCY(j + K / 2);
+                headListY[K_mer_counter] = PBCY(j);
+                //  printf("\n K_mer_id: %d px: %d py: %d hy: %d 0 %d 1\n",(K_mer_counter+1), pivotListX[K_mer_counter], pivotListY[K_mer_counter], headListY[K_mer_counter], (K-1) );
+                printf("\n K_mer_id: %d %d %d %d 0 1\n", (K_mer_counter + 1), headListY[K_mer_counter], pivotListX[K_mer_counter], (K - 1));
+                K_mer_counter++;
+                orientation_type[K_mer_counter] = h_orientation;
+                hor_count++;
+
+                for (k = j; k < (j + K); k++) {
+                    Lat[i][PBCY(k)] = K_mer_counter;
+                }
+            }
+
+
+        }
+    }*/
+
+/******************************************************************************************************************************************/
+for (j = 0 ; j <= Ly; j++) {                                     // all vertical at high density initial configuration
+        for (i = 0; i < (4*Lx)/5; i += K) {
+            if (K_mer_counter == N_Kmer) {
+                break;
+            }
+            for (k = i; k < (i + K); k++) {
+
+                pivotListY[K_mer_counter] = j;
+                headListX[K_mer_counter] = PBCX(i);
+                pivotListX[K_mer_counter] = PBCX(i + K / 2);
+
+                printf("\n K_mer_id: %d %d %d 0 %d 2\n", (K_mer_counter + 1), pivotListY[K_mer_counter], headListX[K_mer_counter], (K - 1));
+                // printf("\n K_mer_id: %d hx: %d px: %d py: %d %d 0 2\n",(K_mer_counter+1), headListX[K_mer_counter], pivotListX[K_mer_counter], pivotListY[K_mer_counter], (K-1));
+                // printf("\n K_mer_id: %d %d %d %d 0 2\n", (K_mer_counter+1), headListX[K_mer_counter], pivotListY[K_mer_counter], (K-1) );
+                K_mer_counter++;
+                orientation_type[K_mer_counter] = v_orientation;
+                ver_count++;
+
+                for (k = i; k < (i + K); k++) {
+                    Lat[PBCX(k)][j] = K_mer_counter;
+                }
+            }
+
+
+        }
+    }
+
+    printf("\ntotal k_mers:%d\n", K_mer_counter);
+
+ /*   int i,j,k;                      // for all horizontal initial configuration
+    bool flag;
+   i=0;
+    do
+    {
+         horizontal();
+         i++;
+    }
+    while (i != N_Kmer); 
+      
+      for(i=0;i<Lx;i++){                                                         
+         for(j=0; j<Ly; j+=K){
+            if(K_mer_counter == N_Kmer){
+               break;
+            }
+
+               flag = true;
+               for(k=j; k<(j+K); k++){
+                  if(Lat[i][PBCY(k)]!=0){
+                     flag = false;
+                  }
+               }
+                  if (flag == true){
+                  double r= (double)(rand())/(double)(RAND_MAX);
+                     if (r<0.24){                  //change
+                        for(k=j; k<(j+K); k++){
+                        Lat[i][PBCY(k)]= 0;
+                     }
+                  }
+                     else{
+                        pivotListX[K_mer_counter]=i;
+                        pivotListY[K_mer_counter]=PBCY(j+K/2);
+                        headListY[K_mer_counter]=PBCY(j);
+                        printf("\n horizontal: K_mer_counter%d pivotx %d pivoty %d\n",K_mer_counter+1,pivotListX[K_mer_counter], pivotListY[K_mer_counter]);
+                       // printf("\n %d %d 7 7",pivotListX[K_mer_counter], HeadlistY[K_mer_counter]);
+                        K_mer_counter++;     
+                        orientation_type[K_mer_counter]= h_orientation;
+                        hor_count++;
+
+                        for(k=j; k<(j+K); k++){
+                        Lat[i][PBCY(k)]= K_mer_counter;
+                        }
+                     }
+                  
+             //  Lat[i][PBCY(k)]= K_mer_counter;
+             //  orientation_type[Lat[i][k]] = h_orientation;
+         
+         //   K_mer_counter++;
+
+         
+                  }
+         }
+      }
+
+
+    printf("\ntotal k=mers:%d\n",K_mer_counter);
+  //  printf("The initial Lattice visualization is: \n");
+  //  printLattice(); 
+
+/***********************************************************************************************************************************/
+/*   int i, j, k;                  // half horizontal and half vertical initial configuration
     bool flag;
 
     printf("initial configuration:\n");
@@ -494,7 +675,7 @@ void output(int t) {
 
    // printf("t %d n_h: %d, n_v: %d\n", t, hor_count, ver_count);
     tmp = 1.0 * (hor_count - ver_count) / (1.0 * K_mer_counter);
-    sprintf(outfile1, "K_mer%dLat_size%dprob%0.3frho%0.3f.dat", K, Lx, p, rho);
+    sprintf(outfile1, "all_hor_0.8_K_mer%dLat_size%dprob%0.3lfrho%0.3lf.dat", K, Lx, p, rho);
     fp = fopen(outfile1, "a");
     fprintf(fp, "%d  %e %e\n", t, tmp, fabs(tmp));
     fclose(fp);
@@ -530,3 +711,4 @@ int main() {
 
 
 }
+
