@@ -5,15 +5,15 @@
 #include<time.h>
 #include "mt19937ar.h"
 #include "mt19937ar.c"
-#define Lx 70
-#define Ly 70
+#define Lx 140
+#define Ly 140
 #define N (Lx*Ly)
 #define n (N/K)  //total no of possible K-mer
 #define K 7
-#define N (Lx*Ly)
+#define N (Lx*Ly)   
 #define T 100000000
-#define rho 0.80
-#define p 1
+#define rho 0.70
+#define p 1.0
 #define p1 1-p
 #define p2 p/2.0
 #define p3 p/2.0
@@ -456,10 +456,10 @@ void Lattice_init() {
 
 
 /****************************************************************************************************************************************/
- int i, j, k;                  // all horizontal at high density initial configuration
+/* int i, j, k;                  // all horizontal at high density initial configuration
     bool flag;
 
-/*    printf("initial configuration:\n");
+    printf("initial configuration:\n");
     for (i = 0; i < Lx; i++) {
         for (j = 0; j < (4*Ly) / 5; j += K) {
             if (K_mer_counter == N_Kmer) {
@@ -484,10 +484,10 @@ void Lattice_init() {
 
 
         }
-    }*/
+    }
 
 /******************************************************************************************************************************************/
-for (j = 0 ; j <= Ly; j++) {                                     // all vertical at high density initial configuration
+/*for (j = 0 ; j <= Ly; j++) {                                     // all vertical at high density initial configuration
         for (i = 0; i < (4*Lx)/5; i += K) {
             if (K_mer_counter == N_Kmer) {
                 break;
@@ -514,7 +514,7 @@ for (j = 0 ; j <= Ly; j++) {                                     // all vertical
         }
     }
 
-    printf("\ntotal k_mers:%d\n", K_mer_counter);
+    printf("\ntotal k_mers:%d\n", K_mer_counter); */
 
  /*   int i,j,k;                      // for all horizontal initial configuration
     bool flag;
@@ -576,7 +576,7 @@ for (j = 0 ; j <= Ly; j++) {                                     // all vertical
   //  printLattice(); 
 
 /***********************************************************************************************************************************/
-/*   int i, j, k;                  // half horizontal and half vertical initial configuration
+   int i, j, k;                  // half horizontal and half vertical initial configuration
     bool flag;
 
     printf("initial configuration:\n");
@@ -675,9 +675,9 @@ void output(int t) {
 
    // printf("t %d n_h: %d, n_v: %d\n", t, hor_count, ver_count);
     tmp = 1.0 * (hor_count - ver_count) / (1.0 * K_mer_counter);
-    sprintf(outfile1, "all_hor_0.8_K_mer%dLat_size%dprob%0.3lfrho%0.3lf.dat", K, Lx, p, rho);
+    sprintf(outfile1, "K_mer%dLat_size%dprob%0.1frho%0.2f.dat", K, Lx, p, rho);
     fp = fopen(outfile1, "a");
-    fprintf(fp, "%d  %e %e\n", t, tmp, fabs(tmp));
+    fprintf(fp, "%d  %e %e %e %e\n", t, tmp, fabs(tmp), (tmp*tmp), (tmp*tmp*tmp*tmp));
     fclose(fp);
 
 }
@@ -711,4 +711,3 @@ int main() {
 
 
 }
-
